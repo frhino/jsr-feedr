@@ -16,3 +16,35 @@ $.ajax({
     // The type of data we expect back
     dataType : "json",
 })
+  .done(function(data){
+    $("#main").empty();
+    data = data.articles;
+    for(i = 0; i < data.length; i++){
+
+      var title = data[i].title;
+      var author = data[i].author;
+      var date = data[i].publishedAt;
+      var image = data[i].urlToImage;
+
+      var articleTemplate = `
+      <article class="article">
+        <section class="featuredImage">
+          <img src="${image}" alt="" />
+        </section>
+        <section class="articleContent">
+            <a href="#"><h3>${title}</h3></a>
+            <h6>${author}</h6>
+        </section>
+        <section class="impressions">
+          ${date}
+          <!--maybe put date or something
+          //pull -->
+        </section>
+        <div class="clearfix"></div>
+      </article>`
+      $("#main").append(articleTemplate)
+      console.log(articleTemplate)
+  //    console.log(data)
+    }
+
+  })
