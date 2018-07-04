@@ -1,11 +1,14 @@
 /*
   Please add all Javascript code to this file.
 */
-
+console.log("hi");
+var mySrc = "cnn";
+myUrl = `https://newsapi.org/v2/top-headlines?sources=${mySrc}&apiKey=b157a0eb622340e1a6e0ddbcb797e508`;
 $.ajax({
+//var mySource = `https://newsapi.org/v2/top-headlines?sources=${source}&apiKey=b157a0eb622340e1a6e0ddbcb797e508`;
 
     // The URL for the request
-    url: "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=b157a0eb622340e1a6e0ddbcb797e508",
+    url: myUrl,
 
     // The data to send (will be converted to a query string)
     data: "",
@@ -16,6 +19,7 @@ $.ajax({
     // The type of data we expect back
     dataType : "json",
 })
+
   .done(function(data){
     $("#main").empty();
     data = data.articles;
