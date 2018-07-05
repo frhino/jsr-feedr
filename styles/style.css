@@ -230,7 +230,7 @@ nav ul ul li {
 .article .impressions {
   width: 15%;
   float: right;
-  font-size: 30px;
+  font-size: 1 em;
   margin-top: 15px;
   text-align: right;
   color: #097FB2;
