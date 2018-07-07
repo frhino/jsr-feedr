@@ -1,18 +1,21 @@
 $(document).ready(function(){
   $( ".container" ).on( "click", ".article", function( event ) {
       event.preventDefault();
+      var iID = $(this).data("id");
       var iTitle = $(this).find("h3").text();
       var iDesc = $(this).find(".descH").text();
       var iUrl = $(this).find(".urlPH").text();
+//      var obj = JSON.parse($(myResults));
+      var iPub = $(this).find("h6").text();
       var iImage = $(this).find("img").attr("src");
       var popUpChildren = $("#popUp").children(".container");
       popUpChildren.children("h1").html(iTitle);
       popUpChildren.children("p").html(iDesc);
-      console.log($(this).text());
+      console.log(myResults[iID].title);
 
       popUpChildren.children("a").attr("href", iUrl);
       popUpChildren.children(".cmon").attr("src", iImage);
-      console.log(popUpChildren.children(".cmon").attr("src"));
+//      console.log(popUpChildren.children(".cmon").attr("src"));
       $("#popUp").removeClass("loader hidden");
   });
   $( ".closePopUp" ).on( "click", function( event ) {
@@ -60,10 +63,10 @@ $.ajax({
       var image = data[i].urlToImage;
       var link = data[i].url;
       var synop = data[i].description;
-      var artId = [i];
+      var artId = i;
 
       var articleTemplate = `
-      <article class="article" id="${artId}">
+      <article class="article" data-id="${artId}">
         <section class="featuredImage">
           <img src="${image}" alt="" />
         </section>

@@ -17,10 +17,11 @@
 }
 
 #popUp .cmon {
-    width: 60%;
     float: left;
     margin: 1.5%;
-    max-width: 300px;
+    vertical-align: top;
+    margin-top: 80px;
+    width: 60%
 }
 #popUp .cmon {
   max-width: 100%;
@@ -51,6 +52,7 @@
 }
 
 #popUp h1 {
+  display: inline;
   margin-bottom: 0;
 }
 
@@ -64,7 +66,7 @@
   margin-top: 30px;
   display: inline-block;
   position: relative;
-  bottom: -25px;
+  vertical-align: bottom;
 }
 
 #popUp .popUpAction:hover {
