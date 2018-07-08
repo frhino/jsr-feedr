@@ -25,12 +25,12 @@
           <section class="container">
             <a href="#"><h1>Feedr</h1></a>
             <nav>
-              <ul>
-                <li><a href="#">News Source: <span>Source Name</span></a>
+              <ul class="sources">
+                <li class="init"><a href="#">News Source: <span>Source Name</span></a>
                   <ul>
-                      <li><a href="#">Source 1</a></li>
-                      <li><a href="#">Source 2</a></li>
-                      <li><a href="#">Source 3</a></li>
+                    <li data-value="nyt"><a href="#">The New York Times</a></li>
+                    <li data-value="guardian"><a href="#">The Guardian</a></li>
+                    <li data-value="newsapi"><a href="#">newsapi</a></li>
                   </ul>
                 </li>
               </ul>
@@ -52,7 +52,7 @@
              <img src="#" class="cmon" alt="" />
              <h1>Article title here</h1>
              <p>Article description/content here.</p>
-             <a href="#" class="popUpAction" target="_blank">Read more from source</a>
+             <a href="#" class="popUpAction" target="_blank">Read more from <span class="pub">source</span></a>
            </div>
         </div>
         <section id="main" class="container">

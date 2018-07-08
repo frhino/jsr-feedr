@@ -1,3 +1,48 @@
+//couldn't find creator info, but borrowed from http://jsfiddle.net/amofb8xa/239/
+//pass string variable such as "source.name" to get api response content
+function fetchFromObject(obj, prop){
+    //property not found
+    if(typeof obj === 'undefined') return false;
+
+    //index of next property split
+    var _index = prop.indexOf('.')
+
+    //property split found; recursive call
+    if(_index > -1){
+        //get object at property (before split), pass on remainder
+        return fetchFromObject(obj[prop.substring(0, _index)], prop.substr(_index+1));
+    }
+
+    //no split; get property
+    return obj[prop];
+}
+
+var nyt = {
+  'selector' : 'results',
+  'requestUrl' : 'http://api.nytimes.com/svc/topstories/v2/home.json?api-key=f23f82f9559d4e1b8eb912b389e58c78',
+  'title' : 'title',
+  'description' : 'abstract',
+  'author' : 'byline',
+  'pub' : 'The New York Times',
+  'date' : 'published_date',
+  'image' : 'multimedia.4.url',
+  'link' : 'url'
+
+}
+var newsapi = {
+  'selector' : 'articles',
+  'requestUrl' : `https://newsapi.org/v2/top-headlines?country=us&apiKey=b157a0eb622340e1a6e0ddbcb797e508`,
+  'title' : 'title',
+  'description' : 'description',
+  'author' : 'author',
+  'pub' : 'source.name',
+  'date' : 'publishedAt',
+  'image' : 'urlToImage',
+  'link' : 'url'
+}
+
+//figure out fallback url
+
 $(document).ready(function(){
   $( ".container" ).on( "click", ".article", function( event ) {
       event.preventDefault();
@@ -21,68 +66,102 @@ $(document).ready(function(){
   $( ".closePopUp" ).on( "click", function( event ) {
       event.preventDefault();
       $("#popUp").addClass("loader hidden");
+    });
+
+    // $("nav ul ul li").on("click", function() {
+    //   $(".init").html(event.target.textContent);
+    // });
+    $('.init ul li').click(function() {
+    chooseSrc($(event.target).parent().data('value'));
     })
+
+  $("#search").on("click", function() {
+    $("#search").toggleClass("active");
+    $("#sources").toggleClass("active");
+  });
 })
 //build function for popup
-var mySrc = "abc-news-au";
 var myResults;
-myUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=b157a0eb622340e1a6e0ddbcb797e508`;
-$.ajax({
-//var mySource = `https://newsapi.org/v2/top-headlines?sources=${source}&apiKey=b157a0eb622340e1a6e0ddbcb797e508`;
 
-    // The URL for the request
-    url: myUrl,
+var chooseSrc = function(newsSrc) {
+  var normObj;
+  switch (newsSrc) {
+    case 'nyt' :
+    normObj = nyt;
+    break;
+    case 'newsapi' :
+    normObj = newsapi;
+    break;
+  }
 
-    // The data to send (will be converted to a query string)
-    data: "",
+  $.ajax({
+  //var mySource = `https://newsapi.org/v2/top-headlines?sources=${source}&apiKey=b157a0eb622340e1a6e0ddbcb797e508`;
 
-    // Whether this is a POST or GET request
-    type: "GET",
+      // The URL for the request
+      url: normObj.requestUrl,
 
-    // The type of data we expect back
-    dataType : "json",
-})
+      // The data to send (will be converted to a query string)
+      data: "",
 
+      // Whether this is a POST or GET request
+      type: "GET",
+
+      // The type of data we expect back
+      dataType : "json",
+  })
+
+//simplify  done functionality
+//lines 116 difference between sources is data.articles vs data.myResults
+//
   .done(function(data){
     $("#main").empty();
-  //  $("#popUp").empty();
-    data = data.articles;
-    myResults = data;
-    for(i = 0; i < data.length; i++){
-      var title = data[i].title;
-      var description = data[i].description;
-      var author = data[i].author;
-      var pub = data[i].source.name;
-      var credit;
-        if (author == null || author.match(/http/i)){
-          credit = pub;
-        } else {
-          credit = author + " for " + pub;
-        }
-      var date = moment(data[i].publishedAt).format('ddd, MMM DD, YYYY hh:mm:ss:a')
-      var image = data[i].urlToImage;
-      var link = data[i].url;
-      var synop = data[i].description;
-      var artId = i;
+//    console.log(data.results.length);
+        for (i = 0; i < data[normObj.selector].length; i++){
+          var item = data[normObj.selector][i];
+          console.log(item);
+          var title = item.title;
+          var description = item.description;
+          var author = item.author;
+          var pub = "";
 
-      var articleTemplate = `
-      <article class="article" data-id="${artId}">
-        <section class="featuredImage">
-          <img src="${image}" alt="" />
-        </section>
-        <section class="articleContent">
-            <a href="#"><h3>${title}</h3></a>
-            <p class="descH">${description}</p>
-            <p class="urlPH">${link}</p>
-            <h6>${credit}</h6>
-        </section>
-        <section class="impressions">
-          ${date}
-          <!--maybe put date or something
-          //pull -->
-        </section>
-        <div class="clearfix"></div>
-      </article>`
-      $("#main").append(articleTemplate)
-    }
+          var credit;
+            if (author == null || author.match(/http/i)){
+              credit = pub;
+            } else {
+              credit = author + " for " + pub;
+            }
+          var date = moment(item.publishedAt).format('ddd, MMM DD, YYYY hh:mm:ss:a')
+          var image = fetchFromObject(item, normObj.image);
+          console.log(fetchFromObject(item, normObj.image));
+          var link = item.url;
+          var artId = i;
+          console.log(s(artId, image, title, description, link, credit,  date))
+          $("#main").append(s(artId, image, title, description, link, credit,  date));
+        }
+
+//    data = data.articles;
+
   })
+}
+var s = function(artId = "", image = "", title = "", description = "", link = "", credit = "",  date = ""){
+  var articleTemplate = `
+  <article class="article" data-id="${artId}">
+    <section class="featuredImage">
+      <img src="${image}" alt="" />
+    </section>
+    <section class="articleContent">
+        <a href="#"><h3>${title}</h3></a>
+        <p class="descH">${description}</p>
+        <p class="urlPH">${link}</p>
+        <h6>${credit}</h6>
+    </section>
+    <section class="impressions">
+      ${date}
+      <!--maybe put date or something
+      //pull -->
+    </section>
+    <div class="clearfix"></div>
+  </article>`
+return articleTemplate;
+//$("#main").append(articleTemplate)
+}
