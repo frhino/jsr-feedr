@@ -41,6 +41,18 @@ var newsapi = {
   'link' : 'url'
 }
 
+var guardian = {
+  'selector' : 'response.results',
+  'requestUrl' : 'https://content.guardianapis.com/search?api-key=a071fded-06cd-4bab-84a6-0cbe8d522f5c&show-fields=all',
+  'title' : 'webTitle',
+  'description' : 'description',
+  'author' : 'byline',
+  'pub' : '',
+  'date' : 'webPublicationDate',
+  'image' : 'thumbnail',
+  'link' : 'webUrl'
+}
+
 //figure out fallback url
 
 $(document).ready(function(){
@@ -92,11 +104,13 @@ var chooseSrc = function(newsSrc) {
     case 'newsapi' :
     normObj = newsapi;
     break;
+    case 'guardian' :
+    normObj = guardian;
+    break;
   }
 
   $.ajax({
-  //var mySource = `https://newsapi.org/v2/top-headlines?sources=${source}&apiKey=b157a0eb622340e1a6e0ddbcb797e508`;
-
+ 
       // The URL for the request
       url: normObj.requestUrl,
 
@@ -115,7 +129,7 @@ var chooseSrc = function(newsSrc) {
 //
   .done(function(data){
     $("#main").empty();
-//    console.log(data.results.length);
+//    console.log(data[normObj.selector].length);
         for (i = 0; i < data[normObj.selector].length; i++){
           var item = data[normObj.selector][i];
           console.log(item);
