@@ -1,22 +1,3 @@
-//couldn't find creator info, but borrowed from http://jsfiddle.net/amofb8xa/239/
-//pass string variable such as "source.name" to get api response content
-function fetchFromObject(obj, prop){
-    //property not found
-    if(typeof obj === 'undefined') return false;
-
-    //index of next property split
-    var _index = prop.indexOf('.')
-
-    //property split found; recursive call
-    if(_index > -1){
-        //get object at property (before split), pass on remainder
-        return fetchFromObject(obj[prop.substring(0, _index)], prop.substr(_index+1));
-    }
-
-    //no split; get property
-    return obj[prop];
-}
-
 var nyt = {
   'selector' : 'results',
   'requestUrl' : 'http://api.nytimes.com/svc/topstories/v2/home.json?api-key=f23f82f9559d4e1b8eb912b389e58c78',
@@ -25,7 +6,7 @@ var nyt = {
   'author' : 'byline',
   'pub' : 'The New York Times',
   'date' : 'published_date',
-  'image' : 'multimedia.4.url',
+  'image' : '[multimedia.4.url]',
   'link' : 'url'
 
 }
@@ -42,13 +23,14 @@ var newsapi = {
 }
 
 var guardian = {
-  'selector' : 'response.results',
+  'selector' : 'response',
+  'selector2' : 'results',
   'requestUrl' : 'https://content.guardianapis.com/search?api-key=a071fded-06cd-4bab-84a6-0cbe8d522f5c&show-fields=all',
-  'title' : 'webTitle',
-  'description' : 'description',
+  'title' : 'fields.headline',
+  'description' : '',
   'author' : 'byline',
-  'pub' : '',
-  'date' : 'webPublicationDate',
+  'pub' : 'The Guardian',
+  'date' : 'firstPublicationDate',
   'image' : 'thumbnail',
   'link' : 'webUrl'
 }
@@ -95,7 +77,7 @@ $(document).ready(function(){
 //build function for popup
 var myResults;
 
-var chooseSrc = function(newsSrc) {
+var chooseSrc = function(newsSrc){
   var normObj;
   switch (newsSrc) {
     case 'nyt' :
@@ -108,7 +90,7 @@ var chooseSrc = function(newsSrc) {
     normObj = guardian;
     break;
   }
-
+//console.log(normObj.selector);
   $.ajax({
  
       // The URL for the request
@@ -129,34 +111,42 @@ var chooseSrc = function(newsSrc) {
 //
   .done(function(data){
     $("#main").empty();
-//    console.log(data[normObj.selector].length);
+//    console.log(data[normObj.selector][normObj.selector2][0].fields.headline);
         for (i = 0; i < data[normObj.selector].length; i++){
-          var item = data[normObj.selector][i];
-          console.log(item);
-          var title = item.title;
-          var description = item.description;
-          var author = item.author;
-          var pub = "";
-
+          var item = data[normObj.selector];
+ //         console.log(normObj.description);
+ //         (normObj === guardian) ? item = data[normObj.selector][normObj.selector2][i] : item = data[normObj.selector][i];
+          var title = item[i][normObj.title];
+          
+          var description = item[i][normObj.description];
+ //         console.log(item[i][normObj.description]);
+          var author = item[i][normObj.author];
           var credit;
-            if (author == null || author.match(/http/i)){
+          if (normObj === guardian || nyt) {
+            credit = author;
+          } else if (author == null || author.match(/http/i)){
+            var pub = item[i][normObj.pub];
               credit = pub;
             } else {
               credit = author + " for " + pub;
             }
+            
           var date = moment(item.publishedAt).format('ddd, MMM DD, YYYY hh:mm:ss:a')
-          var image = fetchFromObject(item, normObj.image);
-          console.log(fetchFromObject(item, normObj.image));
-          var link = item.url;
+          var image = item[i][normObj.image];
+          console.log(image)
+ //        console.log(title, description, author, pub, date, image);
+          var link = item[i][normObj.url];
           var artId = i;
-          console.log(s(artId, image, title, description, link, credit,  date))
-          $("#main").append(s(artId, image, title, description, link, credit,  date));
+
+
+ //        console.log(s(artId, image, title, description, link, credit,  date))
+ //         $("#main").append(s(artId, title, description, link, credit,  date, image));
         }
 
-//    data = data.articles;
+//   data = data.articles;
+    }) 
+  }
 
-  })
-}
 var s = function(artId = "", image = "", title = "", description = "", link = "", credit = "",  date = ""){
   var articleTemplate = `
   <article class="article" data-id="${artId}">
@@ -177,5 +167,5 @@ var s = function(artId = "", image = "", title = "", description = "", link = ""
     <div class="clearfix"></div>
   </article>`
 return articleTemplate;
-//$("#main").append(articleTemplate)
+$("#main").append(articleTemplate)
 }
