@@ -25,6 +25,7 @@ var newsapi = {
 var guardian = {
   'selector' : 'response',
   'selector2' : 'results',
+  'item_selector' : 'fields',
   'requestUrl' : 'https://content.guardianapis.com/search?api-key=a071fded-06cd-4bab-84a6-0cbe8d522f5c&show-fields=all',
   'title' : 'fields.headline',
   'description' : '',
@@ -102,26 +103,29 @@ var chooseSrc = function(newsSrc){
 
   .done(function(data){
     $("#main").empty();
-    var foo = normObj.selector;
+    var norm = normObj;
+    var foo = norm.selector;
     var bar = data[foo];
 
 console.log(myResults, 'response type:');
 console.dir(bar);
 console.log(Array.isArray(bar));
-    (Array.isArray(bar)) ?  bar = bar : bar = data[foo].results;
-    var baz = bar[0];
+    (Array.isArray(bar)) ?  bar = bar : bar = data[foo][normObj.selector2];
 console.log('If response type = Object, then add the child selector to return array items');
 console.log(myResults, 'first item:');
+    var baz = bar[0];
 console.log(baz);
 console.log(myResults, 'first item type:');
 console.dir(baz);
 console.log(myResults, ': some object results:');
-console.log(baz);
-console.log('title: ', baz.title+ '\n' +
-            'description: ', baz.description+ '\n' +
-            'author: ', baz.author+ '\n' +
-            'date: ', baz.date+ '\n' +
-            'image: ', baz.image);
+console.log('If properties are in a parent property, add parent');
+    (myResults === 'guardian') ? baz = baz[normObj.item_selector] : norm = norm;
+console.log(baz[norm.author]);
+console.log('title: ', baz[norm.title]+ '\n' +
+            'description: ', baz[norm.description]+ '\n' +
+            'author: ', baz[norm.author]+ '\n' +
+            'date: ', baz[norm.date]+ '\n' +
+            'image: ', baz[norm.image]);
 console.log('hard coded NYT object property arguments:'+ '\n' +
             'baz.abstract (description):', baz.abstract+ '\n' +
             'baz.byline (author):', baz.abstract+ '\n' +
