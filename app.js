@@ -6,7 +6,7 @@ var nyt = {
   'author' : 'byline',
   'pub' : 'The New York Times',
   'date' : 'published_date',
-  'image' : 'multimedia[4].url',
+  'image' : 'multimedia.4.url',
   'link' : 'url'
 }
 
@@ -61,7 +61,7 @@ $(document).ready(function(){
       event.preventDefault();
       $("#popUp").addClass("loader hidden");
     });
-    var myResults;
+
     // $("nav ul ul li").on("click", function() {
     //   $(".init").html(event.target.textContent);
     // });
@@ -74,64 +74,61 @@ $(document).ready(function(){
     $("#sources").toggleClass("active");
   });
 })
+//build function for popup
+var myResults;
 
-
-var normObj;
 var chooseSrc = function(newsSrc){
+  var normObj;
   switch (newsSrc) {
     case 'nyt' :
     normObj = nyt;
-    myResults = 'nyt';
     break;
     case 'newsapi' :
     normObj = newsapi;
-    myResults = 'newsapi';
     break;
     case 'guardian' :
     normObj = guardian;
-    myResults = 'guardian';
     break;
   }
 //console.log(normObj.selector);
   $.ajax({
+ 
+      // The URL for the request
       url: normObj.requestUrl,
+
+      // The data to send (will be converted to a query string)
       data: "",
+
+      // Whether this is a POST or GET request
       type: "GET",
+
+      // The type of data we expect back
       dataType : "json",
   })
 
+//simplify  done functionality
+//lines 116 difference between sources is data.articles vs data.myResults
+//
   .done(function(data){
     $("#main").empty();
-    var foo = normObj.selector;
-    var bar = data[foo];
-
-console.log(myResults, 'response type:');
-console.dir(bar);
-console.log(Array.isArray(bar));
-    (Array.isArray(bar)) ?  bar = bar : bar = data[foo].results;
-    var baz = bar[0];
-console.log('If response type = Object, then add the child selector to return array items');
-console.log(myResults, 'first item:');
-console.log(baz);
-console.log(myResults, 'first item type:');
-console.dir(baz);
-console.log(myResults, ': some object results:');
-console.log(baz);
-console.log('title: ', baz.title+ '\n' +
-            'description: ', baz.description+ '\n' +
-            'author: ', baz.author+ '\n' +
-            'date: ', baz.date+ '\n' +
-            'image: ', baz.image);
-console.log('hard coded NYT object property arguments:'+ '\n' +
-            'baz.abstract (description):', baz.abstract+ '\n' +
-            'baz.byline (author):', baz.abstract+ '\n' +
-            'baz.published_date (date):', baz.published_date+ '\n' +
-            'baz.multimedia[4].url (image):', baz.multimedia[4].url);
-
+//    console.log(data[normObj.selector][normObj.selector2][0].fields.headline);
+        var alldata = data[normObj.selector];
+        var pic = alldata[0].multimedia[4].url;
+        var how = normObj.image;
+        console.log(how);
+        console.log('hardcoded multi... ', pic);
+        console.log('alldata[0] + how ', alldata[0][how]);
+//broke console.log(data[normObj.selector][0][normObj.image]);
+console.log('first article using normObj ', data[normObj.selector][0]);
+console.log('hardcoded multi ... image ' + data[normObj.selector][0].multimedia[4].url);
+//console.log('normalized image ' + data[normObj.selector][0].normObj.image);
         for (i = 0; i < data[normObj.selector].length; i++){
           var item = data[normObj.selector];
-          var title = item[i][normObj.title];         
+ //         (normObj === guardian) ? item = data[normObj.selector][normObj.selector2][i] : item = data[normObj.selector][i];
+          var title = item[i][normObj.title];
+          
           var description = item[i][normObj.description];
+ //         console.log(item[i][normObj.description]);
           var author = item[i][normObj.author];
           var credit;
           if (normObj === guardian || nyt) {
@@ -141,15 +138,21 @@ console.log('hard coded NYT object property arguments:'+ '\n' +
               credit = pub;
             } else {
               credit = author + " for " + pub;
-            }           
+            }
+            
           var date = moment(item.publishedAt).format('ddd, MMM DD, YYYY hh:mm:ss:a')
-//          var image = item[i].multimedia[4].url;
-//          console.log('image ', image);
+          var image = item[i];
+ //         console.log(image);
+ //        console.log(title, description, author, pub, date, image);
           var link = item[i][normObj.url];
           var artId = i;
 
+
+ //        console.log(s(artId, image, title, description, link, credit,  date))
  //         $("#main").append(s(artId, title, description, link, credit,  date, image));
         }
+
+//   data = data.articles;
     }) 
   }
 
